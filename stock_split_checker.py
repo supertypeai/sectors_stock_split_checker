@@ -25,7 +25,7 @@ class StockSplitChecker:
             if len(row.find_all('td'))>2 :
                 values = row.find_all('td')
                 date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
-                if date<=self.current_date :
+                if date<=self.current_date:
                     break
                 data_dict = {
                     'symbol':values[1].find('a').text.strip()+'.JK',
@@ -37,8 +37,10 @@ class StockSplitChecker:
     def upsert_to_db(self):
         if not self.records:
             raise Exception("No records to upsert to database")
-        
-        self.supabase_client.table('idx_future_stock_split').upsert(self.records).execute()
+        try:
+            self.supabase_client.table('idx_future_stock_split').upsert(self.records).execute()
+        except Exception as e:
+            raise Exception(f"Error upserting to database: {e}")
         
 if __name__ == "__main__":
     url, key = os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY')
