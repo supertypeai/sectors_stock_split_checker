@@ -12,6 +12,8 @@ class StockSplitChecker:
         self.supabase_client = supabase_client
         self.records = []   
         self.current_date = datetime.today().strftime('%Y-%m-%d')
+        response = self.supabase_client.table('idx_future_stock_split').select('*').execute()
+        self.current_records = response.data
     
     def get_stock_split_records(self) :
         response = requests.get(self.url)
@@ -22,7 +24,7 @@ class StockSplitChecker:
         table = soup.find('table', {'class':'tbl_border_gray'})
         rows = table.find_all('tr', recursive=False)[1:]
         for row in rows :
-            if len(row.find_all('td'))>2 :
+            if len(row.find_all('td'))>2:
                 values = row.find_all('td')
                 date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
                 if date<=self.current_date:
@@ -32,13 +34,16 @@ class StockSplitChecker:
                     'date':date,
                     'split_ratio':int(values[4].text.strip())
                 }
-                self.records.append(data_dict)
+                if data_dict not in self.current_records:
+                    self.records.append(data_dict)
 
     def upsert_to_db(self):
         if not self.records:
-            raise Exception("No records to upsert to database")
+            print("No records to upsert to database. All data is up to date")
+            raise SystemExit(0)
         try:
             self.supabase_client.table('idx_future_stock_split').upsert(self.records).execute()
+            print("Successfully upserted data to database")
         except Exception as e:
             raise Exception(f"Error upserting to database: {e}")
         
