@@ -25,10 +25,3 @@ jobs:
             SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
             SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python stock_split_checker.py
-
-      - name: Commit and Push Changes
-        run: |
-            git config user.name "GitHub Actions"
-            git config user.email "actions@users.noreply.github.com"
-            git commit -m "Check and Update Stock Split Data"
-            git push
