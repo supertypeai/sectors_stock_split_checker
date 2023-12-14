@@ -8,7 +8,7 @@ load_dotenv()
 
 class StockSplitChecker:
     def __init__(self, supabase_client) :
-        self.url = "https://sahamidx.com/?view=Stock.Split&path=Stock"
+        self.urls = ["https://sahamidx.com/?view=Stock.Split&path=Stock", "https://sahamidx.com/?view=Stock.Reverse&path=Stock"]
         self.supabase_client = supabase_client
         self.records = []   
         self.current_date = datetime.today().strftime('%Y-%m-%d')
@@ -16,26 +16,28 @@ class StockSplitChecker:
         self.current_records = response.data
     
     def get_stock_split_records(self) :
-        response = requests.get(self.url)
-        if response.status_code != 200 :
-            raise Exception("Error retrieving data from SahamIDX")
-        
-        soup = BeautifulSoup(response.text, "lxml")
-        table = soup.find('table', {'class':'tbl_border_gray'})
-        rows = table.find_all('tr', recursive=False)[1:]
-        for row in rows :
-            if len(row.find_all('td'))>2:
-                values = row.find_all('td')
-                date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
-                if date<=self.current_date:
-                    break
-                data_dict = {
-                    'symbol':values[1].find('a').text.strip()+'.JK',
-                    'date':date,
-                    'split_ratio':int(values[4].text.strip())
-                }
-                if data_dict not in self.current_records:
-                    self.records.append(data_dict)
+        for url in self.urls:
+            response = requests.get(url)
+            if response.status_code != 200 :
+                raise Exception("Error retrieving data from SahamIDX")
+            
+            soup = BeautifulSoup(response.text, "lxml")
+            table = soup.find('table', {'class':'tbl_border_gray'})
+            rows = table.find_all('tr', recursive=False)[1:]
+            for row in rows :
+                if len(row.find_all('td'))>2:
+                    values = row.find_all('td')
+                    date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
+                    if date<=self.current_date:
+                        break
+                    split_ratio = float(values[4].text.strip()) / float(values[3].text.strip())
+                    data_dict = {
+                        'symbol':values[1].find('a').text.strip()+'.JK',
+                        'date':date,
+                        'split_ratio':round(split_ratio,5)
+                    }
+                    if data_dict not in self.current_records:
+                        self.records.append(data_dict)
 
     def upsert_to_db(self):
         if not self.records:
