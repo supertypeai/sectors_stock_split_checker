@@ -8,7 +8,7 @@ load_dotenv()
 
 class StockSplitChecker:
     def __init__(self, supabase_client) :
-        self.urls = ["https://sahamidx.com/?view=Stock.Split&path=Stock", "https://sahamidx.com/?view=Stock.Reverse&path=Stock"]
+        self.urls = ["https://sahamidx.com/?view=Stock.Split&path=Stock&field_sort=split_date&sort_by=DESC&page=1", "https://sahamidx.com/?view=Stock.Reverse&path=Stock&field_sort=reverse_date&sort_by=DESC&page=1"]
         self.supabase_client = supabase_client
         self.records = []   
         self.current_date = datetime.today().strftime('%Y-%m-%d')
