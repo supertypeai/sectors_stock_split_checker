@@ -30,7 +30,9 @@ class StockSplitChecker:
                     date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
                     if date<=self.current_date:
                         break
-                    split_ratio = float(values[4].text.strip()) / float(values[3].text.strip())
+                    old_value = float(values[3].text.strip().replace(',',''))
+                    new_value = float(values[4].text.strip().replace(',',''))
+                    split_ratio = new_value / old_value
                     data_dict = {
                         'symbol':values[1].find('a').text.strip()+'.JK',
                         'date':date,
