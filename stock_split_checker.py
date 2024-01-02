@@ -1,5 +1,6 @@
 import os
 import requests
+import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 from supabase import create_client
@@ -13,9 +14,13 @@ class StockSplitChecker:
         self.records = []   
         self.current_date = datetime.today().strftime('%Y-%m-%d')
         response = self.supabase_client.table('idx_future_stock_split').select('*').execute()
-        self.current_records = response.data
+        data = pd.DataFrame(response.data)
+        data = data.loc[data['date']>self.current_date]
+        data['split_ratio'] = data['split_ratio'].astype(float)
+        self.current_records = data.to_dict('records')
+        self.records_to_delete = []
     
-    def get_stock_split_records(self) :
+    def get_stock_split_records(self):
         for url in self.urls:
             response = requests.get(url)
             if response.status_code != 200 :
@@ -29,7 +34,7 @@ class StockSplitChecker:
                     values = row.find_all('td')
                     date = datetime.strptime(values[-2].text.strip(), '%d-%b-%Y').strftime('%Y-%m-%d')
                     if date<=self.current_date:
-                        break
+                        continue
                     old_value = float(values[3].text.strip().replace(',',''))
                     new_value = float(values[4].text.strip().replace(',',''))
                     split_ratio = new_value / old_value
@@ -38,13 +43,32 @@ class StockSplitChecker:
                         'date':date,
                         'split_ratio':round(split_ratio,5)
                     }
-                    if data_dict not in self.current_records:
-                        self.records.append(data_dict)
+                    self.records.append(data_dict)
+        for record in self.current_records:
+            if record not in self.records:
+                self.records_to_delete.append(record)
+        for record in self.records:
+            if record in self.current_records:
+                self.records.remove(record)
 
     def upsert_to_db(self):
+        if self.records_to_delete:
+            print("Deleting records due to update in source")
+            for record in self.records_to_delete:
+                try:
+                    self.supabase_client.rpc('delete_stock_split_records', params={
+                        'symbol':record['symbol'],
+                        'date':record['date'],
+                        'split_ratio':record['split_ratio']
+                        }).execute()
+                    print(f"Successfully deleted record: {record}")
+                except Exception as e:
+                    print(f'Fail to delete record: {record}. Error: {e}')
+                    
         if not self.records:
             print("No records to upsert to database. All data is up to date")
             raise SystemExit(0)
+        
         try:
             self.supabase_client.table('idx_future_stock_split').upsert(self.records).execute()
             print("Successfully upserted data to database")
