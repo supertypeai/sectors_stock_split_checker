@@ -1,4 +1,4 @@
-name: Check and Update Stock Split Weekly
+name: Check and Update Stock Split Daily
 
 on:
   schedule:
