@@ -11,7 +11,6 @@ class StockSplitChecker:
     def __init__(self, supabase_client) :
         self.urls = ["https://sahamidx.com/?view=Stock.Split&path=Stock&field_sort=split_date&sort_by=DESC&page=1", "https://sahamidx.com/?view=Stock.Reverse&path=Stock&field_sort=reverse_date&sort_by=DESC&page=1"]
         self.supabase_client = supabase_client
-        self.records = []   
         self.current_date = datetime.today().strftime('%Y-%m-%d')
         response = self.supabase_client.table('idx_future_stock_split').select('*').execute()
         data = pd.DataFrame(response.data)
@@ -19,6 +18,7 @@ class StockSplitChecker:
         data['split_ratio'] = data['split_ratio'].astype(float)
         self.current_records = data.to_dict('records')
         self.records_to_delete = []
+        self.records = []   
     
     def get_stock_split_records(self):
         for url in self.urls:
@@ -71,7 +71,7 @@ class StockSplitChecker:
         
         try:
             self.supabase_client.table('idx_future_stock_split').upsert(self.records).execute()
-            print("Successfully upserted data to database")
+            print(f"Successfully upserted {len(self.records)} data to database")
         except Exception as e:
             raise Exception(f"Error upserting to database: {e}")
         
