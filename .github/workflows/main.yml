@@ -3,6 +3,9 @@ name: Check and Update Stock Split Daily
 on:
   schedule:
     - cron: "0 0 * * *" # Schedule to run at 00:00 AM Daily
+  
+  workflow_dispatch:
+  
 jobs:
   check_stock_split:
     runs-on: ubuntu-latest
