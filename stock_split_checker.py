@@ -22,9 +22,9 @@ class StockSplitChecker:
         data = pd.DataFrame(response.data)
         data = data.loc[data["date"] > self.current_date]
         data["split_ratio"] = data["split_ratio"].astype(float)
-        self.current_records = data.to_dict("records")
-        self.records_to_delete = []
-        self.records = []
+        self.db_records_future = data.to_dict("records")
+        self.db_records_to_delete = []
+        self.retrieved_records = []
 
     def get_stock_split_records(self):
         for url in self.urls:
@@ -51,20 +51,20 @@ class StockSplitChecker:
                         "date": date,
                         "split_ratio": round(split_ratio, 5),
                     }
-                    self.records.append(data_dict)
+                    self.retrieved_records.append(data_dict)
 
-        for record in self.current_records:
-            if record not in self.records:
-                self.records_to_delete.append(record)
+        for record in self.db_records_future:
+            if record not in self.retrieved_records:
+                self.db_records_to_delete.append(record)
 
-        for record in self.records:
-            if record in self.current_records:
-                self.records.remove(record)
+        for record in self.retrieved_records:
+            if record in self.db_records_future:
+                self.retrieved_records.remove(record)
 
     def upsert_to_db(self):
-        if self.records_to_delete:
+        if self.db_records_to_delete:
             print("Deleting records due to update in source")
-            for record in self.records_to_delete:
+            for record in self.db_records_to_delete:
                 try:
                     self.supabase_client.rpc(
                         "delete_stock_split_records",
@@ -78,13 +78,13 @@ class StockSplitChecker:
                 except Exception as e:
                     print(f"Fail to delete record: {record}. Error: {e}")
 
-        if not self.records:
+        if not self.retrieved_records:
             print("No records to upsert to database. All data is up to date")
             raise SystemExit(0)
 
         try:
-            self.supabase_client.table("idx_stock_split").upsert(self.records).execute()
-            print(f"Successfully upserted {len(self.records)} data to database")
+            self.supabase_client.table("idx_stock_split").upsert(self.retrieved_records).execute()
+            print(f"Successfully upserted {len(self.retrieved_records)} data to database")
         except Exception as e:
             raise Exception(f"Error upserting to database: {e}")
 
