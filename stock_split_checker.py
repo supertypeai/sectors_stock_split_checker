@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 import pandas as pd
+import pytz
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -17,7 +18,9 @@ class StockSplitChecker:
             "https://sahamidx.com/?view=Stock.Reverse&path=Stock&field_sort=reverse_date&sort_by=DESC&page=1",
         ]
         self.supabase_client = supabase_client
-        self.current_date = datetime.today().strftime("%Y-%m-%d")
+        self.current_date = datetime.now(pytz.timezone("Asia/Bangkok")).strftime(
+            "%Y-%m-%d"
+        )
         response = self.supabase_client.table("idx_stock_split").select("*").execute()
         data = pd.DataFrame(response.data)
         data = data.loc[data["date"] > self.current_date]
@@ -83,8 +86,12 @@ class StockSplitChecker:
             raise SystemExit(0)
 
         try:
-            self.supabase_client.table("idx_stock_split").upsert(self.retrieved_records).execute()
-            print(f"Successfully upserted {len(self.retrieved_records)} data to database")
+            self.supabase_client.table("idx_stock_split").upsert(
+                self.retrieved_records
+            ).execute()
+            print(
+                f"Successfully upserted {len(self.retrieved_records)} data to database"
+            )
         except Exception as e:
             raise Exception(f"Error upserting to database: {e}")
 
