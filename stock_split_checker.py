@@ -72,6 +72,7 @@ class StockSplitChecker:
                             "symbol": record["symbol"],
                             "date": record["date"],
                             "split_ratio": record["split_ratio"],
+                            "updated_on": pd.Timestamp.now(tz="GMT").strftime("%Y-%m-%d %H:%M:%S")
                         },
                     ).execute()
                     print(f"Successfully deleted record: {record}")
