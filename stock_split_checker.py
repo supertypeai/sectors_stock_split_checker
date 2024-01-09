@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 import pandas as pd
-import pytz
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -18,9 +17,7 @@ class StockSplitChecker:
             "https://sahamidx.com/?view=Stock.Reverse&path=Stock&field_sort=reverse_date&sort_by=DESC&page=1",
         ]
         self.supabase_client = supabase_client
-        self.current_date = datetime.now(pytz.timezone("Asia/Bangkok")).strftime(
-            "%Y-%m-%d"
-        )
+        self.current_date = pd.Timestamp.now("Asia/Bangkok").strftime("%Y-%m-%d")
         response = self.supabase_client.table("idx_stock_split").select("*").execute()
         data = pd.DataFrame(response.data)
         data = data.loc[data["date"] > self.current_date]
