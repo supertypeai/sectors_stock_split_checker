@@ -92,6 +92,7 @@ class StockSplitChecker:
                 f"Successfully upserted {len(self.retrieved_records)} data to database"
             )
             # Insert news
+            print("Sending data to external endpoint")
             api_key = os.getenv("API_KEY")
             headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             response = requests.post(
