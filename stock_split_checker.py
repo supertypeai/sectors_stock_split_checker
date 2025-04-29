@@ -2,6 +2,8 @@ import json
 import os
 from datetime import datetime
 
+from imp import reload
+import logging
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -10,6 +12,14 @@ from supabase import create_client
 
 load_dotenv()
 
+LOG_FILENAME = 'scrapper.log'
+
+def initiate_logging(LOG_FILENAME):
+    reload(logging)
+
+    formatLOG = '%(asctime)s - %(levelname)s: %(message)s'
+    logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO, format=formatLOG)
+    logging.info('Program started')
 
 class StockSplitChecker:
     def __init__(self, supabase_client):
@@ -112,6 +122,10 @@ if __name__ == "__main__":
     url, key = os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY")
     supabase_client = create_client(url, key)
 
+    initiate_logging(LOG_FILENAME)
+
     stock_split_checker = StockSplitChecker(supabase_client)
     stock_split_checker.get_stock_split_records()
     stock_split_checker.upsert_to_db()
+    
+    logging.info("Finish update stock split data")
