@@ -3,3 +3,4 @@ pandas==2.2.3
 python-dotenv==1.0.0
 requests==2.31.0
 supabase==2.16.0
+lxml==4.9.4
