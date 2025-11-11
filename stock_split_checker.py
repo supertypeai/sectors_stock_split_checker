@@ -1,14 +1,15 @@
-import json
-import os
 from datetime import datetime
-
 from imp import reload
-import logging
-import pandas as pd
-import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from supabase import create_client
+
+import re 
+import json
+import os
+import logging
+import pandas as pd
+import requests
 
 load_dotenv()
 
@@ -24,8 +25,7 @@ def initiate_logging(LOG_FILENAME):
 class StockSplitChecker:
     def __init__(self, supabase_client):
         self.urls = [
-            "https://sahamidx.com/?view=Stock.Split&path=Stock&field_sort=split_date&sort_by=DESC&page=1",
-            "https://sahamidx.com/?view=Stock.Reverse&path=Stock&field_sort=reverse_date&sort_by=DESC&page=1",
+            'https://www.new.sahamidx.com/?/stock-split/page/1'
         ]
         self.supabase_client = supabase_client
         self.current_date = pd.Timestamp.now("Asia/Bangkok").strftime("%Y-%m-%d")
@@ -44,25 +44,58 @@ class StockSplitChecker:
                 raise Exception("Error retrieving data from SahamIDX")
 
             soup = BeautifulSoup(response.text, "lxml")
-            table = soup.find("table", {"class": "tbl_border_gray"})
-            rows = table.find_all("tr", recursive=False)[1:]
+            rows = soup.find_all("tr")
+          
             for row in rows:
-                if len(row.find_all("td")) > 2:
-                    values = row.find_all("td")
-                    date = datetime.strptime(
-                        values[-2].text.strip(), "%d-%b-%Y"
-                    ).strftime("%Y-%m-%d")
-                    if date <= self.current_date:
+                name_cell = row.find("td", {"data-header": "Nama"})
+                ratio_cell = row.find("td", {"data-header": "Ratio"})
+                date_cell = row.find("td", {"data-header": "Ex Date"})
+
+                if not (name_cell and ratio_cell and date_cell):
+                    continue
+                
+                # Get Ex Date
+                date_str = date_cell.text.strip()
+                date = datetime.strptime(date_str, "%d-%b-%Y").strftime("%Y-%m-%d")
+            
+                if date <= self.current_date:
+                    print(f'Skipping {date}')
+                    continue
+
+                # Get Symbol 
+                name_text = name_cell.text.strip()
+                symbol_match = re.search(r'\((.*?)\)', name_text)
+
+                if not symbol_match:
+                    continue 
+
+                symbol = symbol_match.group(1).strip() + ".JK"
+
+                # Get Split Ratio
+                ratio_str = ratio_cell.text.strip() 
+                try:
+                    parts = ratio_str.split(":")
+
+                    if len(parts) != 2:
                         continue
-                    old_value = float(values[3].text.strip().replace(",", ""))
-                    new_value = float(values[4].text.strip().replace(",", ""))
+                        
+                    old_value = float(parts[0].strip())
+                    new_value = float(parts[1].strip())
+                    
+                    if old_value == 0:
+                        continue 
+                        
                     split_ratio = new_value / old_value
-                    data_dict = {
-                        "symbol": values[1].find("a").text.strip() + ".JK",
-                        "date": date,
-                        "split_ratio": round(split_ratio, 5),
-                    }
-                    self.retrieved_records.append(data_dict)
+
+                except (ValueError, TypeError):
+                    continue
+                
+                data_dict = {
+                    "symbol": symbol,
+                    "date": date,
+                    "split_ratio": round(split_ratio, 5),
+                }
+                self.retrieved_records.append(data_dict)
 
         for record in self.db_records_future:
             if record not in self.retrieved_records:
