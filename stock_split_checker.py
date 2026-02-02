@@ -1,5 +1,4 @@
 from datetime import datetime
-from imp import reload
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from supabase import create_client
@@ -10,17 +9,28 @@ import os
 import logging
 import pandas as pd
 import requests
+import time 
+
 
 load_dotenv()
 
-LOG_FILENAME = 'scrapper.log'
 
-def initiate_logging(LOG_FILENAME):
-    reload(logging)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
-    formatLOG = '%(asctime)s - %(levelname)s: %(message)s'
-    logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO, format=formatLOG)
-    logging.info('Program started')
+file_handler = logging.FileHandler('scrapper.log')
+file_handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter(
+    '%(asctime)s [%(levelname)s] - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+file_handler.setFormatter(formatter)
+
+LOGGER.addHandler(file_handler)
+
+LOGGER.info("Init Global Variable")
+
 
 class StockSplitChecker:
     def __init__(self, supabase_client):
@@ -50,14 +60,25 @@ class StockSplitChecker:
                 name_cell = row.find("td", {"data-header": "Nama"})
                 ratio_cell = row.find("td", {"data-header": "Ratio"})
                 date_cell = row.find("td", {"data-header": "Ex Date"})
+                cum_date_cell = row.find("td", {"data-header": "Cum Date"})
+                recording_date_cell = row.find("td", {"data-header": "Recording Date"})
 
                 if not (name_cell and ratio_cell and date_cell):
+                    LOGGER.info(f'some data are null: {name_cell} {ratio_cell} {date_cell}')
                     continue
                 
-                # Get Ex Date
+                # Clean Ex Date
                 date_str = date_cell.text.strip()
                 date = datetime.strptime(date_str, "%d-%b-%Y").strftime("%Y-%m-%d")
-            
+
+                # Clean cum_date 
+                cum_date_str = cum_date_cell.text.strip()
+                cum_date = datetime.strptime(cum_date_str, "%d-%b-%Y").strftime("%Y-%m-%d")
+                
+                # Clean recording_date 
+                recording_date_str = recording_date_cell.text.strip()
+                recording_date = datetime.strptime(recording_date_str, "%d-%b-%Y").strftime("%Y-%m-%d")
+
                 if date <= self.current_date:
                     print(f'Skipping {date}')
                     continue
@@ -67,6 +88,7 @@ class StockSplitChecker:
                 symbol_match = re.search(r'\((.*?)\)', name_text)
 
                 if not symbol_match:
+                    LOGGER.info(f'symbol not extracted: {name_cell} {date_cell}')
                     continue 
 
                 symbol = symbol_match.group(1).strip() + ".JK"
@@ -94,8 +116,15 @@ class StockSplitChecker:
                     "symbol": symbol,
                     "date": date,
                     "split_ratio": round(split_ratio, 5),
+                    "cum_date": cum_date, 
+                    "recording_date": recording_date
                 }
                 self.retrieved_records.append(data_dict)
+
+            time.sleep(2)
+
+        LOGGER.info(f'Extracted data: {json.dumps(self.retrieved_records, indent=2)}')
+        LOGGER.info(f'Extracted {len(self.retrieved_records)} data')
 
         for record in self.db_records_future:
             if record not in self.retrieved_records:
@@ -107,7 +136,7 @@ class StockSplitChecker:
 
     def upsert_to_db(self):
         if self.db_records_to_delete:
-            print("Deleting records due to update in source")
+            LOGGER.info("Deleting records due to update in source")
             for record in self.db_records_to_delete:
                 try:
                     self.supabase_client.rpc(
@@ -119,23 +148,23 @@ class StockSplitChecker:
                             "updated_on": pd.Timestamp.now(tz="GMT").strftime("%Y-%m-%d %H:%M:%S")
                         },
                     ).execute()
-                    print(f"Successfully deleted record: {record}")
+                    LOGGER.info(f"Successfully deleted record: {record}")
                 except Exception as e:
-                    print(f"Fail to delete record: {record}. Error: {e}")
+                    LOGGER.error(f"Fail to delete record: {record}. Error: {e}")
 
         if not self.retrieved_records:
-            print("No records to upsert to database. All data is up to date")
+            LOGGER.warning("No records to upsert to database. All data is up to date")
             raise SystemExit(0)
 
         try:
             self.supabase_client.table("idx_stock_split").upsert(
                 self.retrieved_records
             ).execute()
-            print(
+            LOGGER.info(
                 f"Successfully upserted {len(self.retrieved_records)} data to database"
             )
             # Insert news
-            print("Sending data to external endpoint")
+            LOGGER.info("Sending data to external endpoint")
             api_key = os.getenv("API_KEY")
             headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             response = requests.post(
@@ -144,9 +173,9 @@ class StockSplitChecker:
                 data=json.dumps(self.retrieved_records)
             )
             if response.status_code == 200:
-                print("Successfully sent data to external endpoint")
+                LOGGER.info("Successfully sent data to external endpoint")
             else:
-                print(f"Failed to send data to external endpoint. Status code: {response.status_code}")
+                LOGGER.info(f"Failed to send data to external endpoint. Status code: {response.status_code}")
         except Exception as e:
             raise Exception(f"Error upserting to database: {e}")
 
@@ -154,8 +183,6 @@ class StockSplitChecker:
 if __name__ == "__main__":
     url, key = os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY")
     supabase_client = create_client(url, key)
-
-    initiate_logging(LOG_FILENAME)
 
     stock_split_checker = StockSplitChecker(supabase_client)
     stock_split_checker.get_stock_split_records()
