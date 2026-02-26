@@ -117,7 +117,8 @@ class StockSplitChecker:
                     "date": date,
                     "split_ratio": round(split_ratio, 5),
                     "cum_date": cum_date, 
-                    "recording_date": recording_date
+                    "recording_date": recording_date,
+                    "ratio": ratio_str
                 }
                 self.retrieved_records.append(data_dict)
 
@@ -145,6 +146,7 @@ class StockSplitChecker:
                             "symbol": record["symbol"],
                             "date": record["date"],
                             "split_ratio": record["split_ratio"],
+                            "ratio": record["ratio"],
                             "updated_on": pd.Timestamp.now(tz="GMT").strftime("%Y-%m-%d %H:%M:%S")
                         },
                     ).execute()
