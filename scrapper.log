@@ -780,3 +780,8 @@
 2026-04-08 02:47:33 [INFO] - Successfully upserted 1 data to database
 2026-04-08 02:47:33 [INFO] - Sending data to external endpoint
 2026-04-08 02:47:56 [INFO] - Failed to send data to external endpoint. Status code: 401
+2026-04-09 02:42:00 [INFO] - Init Global Variable
+2026-04-09 02:42:03 [INFO] - some data are null: None None None
+2026-04-09 02:42:05 [INFO] - Extracted data: []
+2026-04-09 02:42:05 [INFO] - Extracted 0 data
+2026-04-09 02:42:05 [WARNING] - No records to upsert to database. All data is up to date
