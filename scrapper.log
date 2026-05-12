@@ -945,3 +945,8 @@
 2026-05-11 03:54:14 [INFO] - Extracted data: []
 2026-05-11 03:54:14 [INFO] - Extracted 0 data
 2026-05-11 03:54:14 [WARNING] - No records to upsert to database. All data is up to date
+2026-05-12 03:37:30 [INFO] - Init Global Variable
+2026-05-12 03:37:32 [INFO] - some data are null: None None None
+2026-05-12 03:37:34 [INFO] - Extracted data: []
+2026-05-12 03:37:34 [INFO] - Extracted 0 data
+2026-05-12 03:37:34 [WARNING] - No records to upsert to database. All data is up to date
