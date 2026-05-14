@@ -950,3 +950,19 @@
 2026-05-12 03:37:34 [INFO] - Extracted data: []
 2026-05-12 03:37:34 [INFO] - Extracted 0 data
 2026-05-12 03:37:34 [WARNING] - No records to upsert to database. All data is up to date
+2026-05-14 03:45:42 [INFO] - Init Global Variable
+2026-05-14 03:45:44 [INFO] - some data are null: None None None
+2026-05-14 03:45:46 [INFO] - Extracted data: [
+  {
+    "symbol": "RAJA.JK",
+    "date": "2026-07-17",
+    "split_ratio": 5.0,
+    "cum_date": "2026-07-16",
+    "recording_date": "2026-07-20",
+    "ratio": "1 : 5"
+  }
+]
+2026-05-14 03:45:46 [INFO] - Extracted 1 data
+2026-05-14 03:45:47 [INFO] - Successfully upserted 1 data to database
+2026-05-14 03:45:47 [INFO] - Sending data to external endpoint
+2026-05-14 03:46:10 [INFO] - Failed to send data to external endpoint. Status code: 401
