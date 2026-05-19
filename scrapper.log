@@ -1038,3 +1038,21 @@
 2026-05-18 04:02:43 [INFO] - Successfully upserted 1 data to database
 2026-05-18 04:02:43 [INFO] - Sending data to external endpoint
 2026-05-18 04:03:06 [INFO] - Failed to send data to external endpoint. Status code: 401
+2026-05-19 03:56:25 [INFO] - Init Global Variable
+2026-05-19 03:56:27 [INFO] - some data are null: None None None
+2026-05-19 03:56:29 [INFO] - Extracted data: [
+  {
+    "symbol": "RAJA.JK",
+    "date": "2026-07-17",
+    "split_ratio": 5.0,
+    "cum_date": "2026-07-16",
+    "recording_date": "2026-07-20",
+    "ratio": "1 : 5"
+  }
+]
+2026-05-19 03:56:29 [INFO] - Extracted 1 data
+2026-05-19 03:56:29 [INFO] - Deleting records due to update in source
+2026-05-19 03:56:29 [ERROR] - Fail to delete record: {'symbol': 'RAJA.JK', 'date': '2026-07-17', 'split_ratio': 5.0, 'updated_on': '2026-05-14T03:45:46.957416+00:00', 'applied_on': None, 'cum_date': '2026-07-16', 'recording_date': '2026-07-20', 'ratio': '1 : 5'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2026-05-19 03:56:30 [INFO] - Successfully upserted 1 data to database
+2026-05-19 03:56:30 [INFO] - Sending data to external endpoint
+2026-05-19 03:56:53 [INFO] - Failed to send data to external endpoint. Status code: 401
