@@ -2321,3 +2321,22 @@
 2026-07-19 03:16:14 [INFO] - Successfully upserted 1 data to database
 2026-07-19 03:16:14 [INFO] - Sending data to external endpoint
 2026-07-19 03:16:36 [INFO] - Failed to send data to external endpoint. Status code: 401
+2026-07-20 03:30:32 [INFO] - Init Global Variable
+2026-07-20 03:30:34 [INFO] - some data are null: None None None
+2026-07-20 03:30:36 [INFO] - Extracted data: [
+  {
+    "symbol": "MLPT.JK",
+    "date": "2026-07-21",
+    "split_ratio": 25.0,
+    "cum_date": "2026-07-20",
+    "recording_date": "2026-07-22",
+    "ratio": "1 : 25"
+  }
+]
+2026-07-20 03:30:36 [INFO] - Extracted 1 data
+2026-07-20 03:30:36 [INFO] - Deleting records due to update in source
+2026-07-20 03:30:37 [ERROR] - Fail to delete record: {'symbol': 'MLPT.JK', 'date': '2026-07-21', 'split_ratio': 25.0, 'updated_on': '2026-07-19T03:16:14.8827+00:00', 'applied_on': None, 'cum_date': '2026-07-20', 'recording_date': '2026-07-22', 'ratio': '1 : 25'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2026-07-20 03:30:37 [ERROR] - Fail to delete record: {'symbol': 'MLPT.JK', 'date': '2026-07-29', 'split_ratio': 25.0, 'updated_on': '2026-05-22T04:00:54.243122+00:00', 'applied_on': None, 'cum_date': '2026-07-28', 'recording_date': '2026-07-30', 'ratio': '1 : 25'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2026-07-20 03:30:38 [INFO] - Successfully upserted 1 data to database
+2026-07-20 03:30:38 [INFO] - Sending data to external endpoint
+2026-07-20 03:31:00 [INFO] - Failed to send data to external endpoint. Status code: 401
