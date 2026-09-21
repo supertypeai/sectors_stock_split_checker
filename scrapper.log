@@ -2722,3 +2722,10 @@
 2026-09-20 04:09:49 [INFO] - Deleting records due to update in source
 2026-09-20 04:09:49 [ERROR] - Fail to delete record: {'symbol': 'PBSA.JK', 'date': '2026-10-14', 'split_ratio': 2.0, 'updated_on': '2026-09-15T06:47:56.170174+00:00', 'applied_on': None, 'cum_date': '2026-10-13', 'recording_date': '2026-10-15', 'ratio': '1:2'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
 2026-09-20 04:09:49 [WARNING] - No records to upsert to database. All data is up to date
+2026-09-21 04:06:55 [INFO] - Init Global Variable
+2026-09-21 04:06:58 [INFO] - some data are null: None None None
+2026-09-21 04:07:00 [INFO] - Extracted data: []
+2026-09-21 04:07:00 [INFO] - Extracted 0 data
+2026-09-21 04:07:00 [INFO] - Deleting records due to update in source
+2026-09-21 04:07:00 [ERROR] - Fail to delete record: {'symbol': 'PBSA.JK', 'date': '2026-10-14', 'split_ratio': 2.0, 'updated_on': '2026-09-15T06:47:56.170174+00:00', 'applied_on': None, 'cum_date': '2026-10-13', 'recording_date': '2026-10-15', 'ratio': '1:2'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2026-09-21 04:07:00 [WARNING] - No records to upsert to database. All data is up to date
