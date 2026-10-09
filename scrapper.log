@@ -2848,3 +2848,21 @@
 2026-10-08 05:17:21 [INFO] - Deleting records due to update in source
 2026-10-08 05:17:21 [ERROR] - Fail to delete record: {'symbol': 'PBSA.JK', 'date': '2026-10-14', 'split_ratio': 2.0, 'updated_on': '2026-10-07T08:44:16.831755+00:00', 'applied_on': None, 'cum_date': '2026-10-13', 'recording_date': '2026-10-15', 'ratio': '1:2'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
 2026-10-08 05:17:21 [WARNING] - No records to upsert to database. All data is up to date
+2026-10-09 05:20:32 [INFO] - Init Global Variable
+2026-10-09 05:20:34 [INFO] - some data are null: None None None
+2026-10-09 05:20:36 [INFO] - Extracted data: [
+  {
+    "symbol": "PBSA.JK",
+    "date": "2026-10-14",
+    "split_ratio": 2.0,
+    "cum_date": "2026-10-13",
+    "recording_date": "2026-10-15",
+    "ratio": "1 : 2"
+  }
+]
+2026-10-09 05:20:36 [INFO] - Extracted 1 data
+2026-10-09 05:20:36 [INFO] - Deleting records due to update in source
+2026-10-09 05:20:37 [ERROR] - Fail to delete record: {'symbol': 'PBSA.JK', 'date': '2026-10-14', 'split_ratio': 2.0, 'updated_on': '2026-10-07T08:44:16.831755+00:00', 'applied_on': None, 'cum_date': '2026-10-13', 'recording_date': '2026-10-15', 'ratio': '1:2'}. Error: {'message': 'Could not find the function public.delete_stock_split_records(date, ratio, split_ratio, symbol, updated_on) in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.delete_stock_split_records(date, split_ratio, symbol, updated_on)', 'details': 'Searched for the function public.delete_stock_split_records with parameters date, ratio, split_ratio, symbol, updated_on or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2026-10-09 05:20:38 [INFO] - Successfully upserted 1 data to database
+2026-10-09 05:20:38 [INFO] - Sending data to external endpoint
+2026-10-09 05:21:01 [INFO] - Failed to send data to external endpoint. Status code: 401
